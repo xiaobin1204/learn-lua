@@ -11,3 +11,36 @@
 7. 通过元表(metatable)和元方法(metamethod)提供动态元机制(dynamic metamechanism)，从而允许程序运行时根据需要改变或扩充语法设施的内定语义；
 8. 能方便地利用表和动态元机制实现基于原型(prototype-based)的面向对象模型；
 9. 从5.1版开始提供了完善的模块机制，从而更好地支持开发大型的应用程序；
+
+### Lua 基础数据类型
+
+函数type能够返回一个值或一个变量所属的类型。
+
+```
+> print(type("hello world"))
+string
+> print(type(print))
+function
+> print(type(true))
+boolean
+> print(type(360.0))
+number
+> print(type(nil))
+nil
+```
+
+nil (空)
+
+nil 是一种类型，Lua将nil用于表示“无效值”。一个变量在第一次赋值前的默认值是nil，将nil 赋予给一个全局变量就等于删除它。
+
+```
+> local num
+> print(num)
+nil
+> num=100
+> print(num)
+100
+> num = nil
+> print(num)
+nil
+```

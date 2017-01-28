@@ -44,3 +44,9 @@ nil
 > print(num)
 nil
 ```
+
+OpenResty的Lua接口还提供了一种特殊的空值，即 `ngx.null` ，用来表示不同于nil的“空值”。
+
+boolean（布尔）
+
+布尔类型，可选值true／false；Lua中nil和false为“假”，其他所有值均为“真”；这一点和其他编程语言有些差异。

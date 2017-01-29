@@ -50,3 +50,11 @@ OpenResty的Lua接口还提供了一种特殊的空值，即 `ngx.null` ，用�
 boolean（布尔）
 
 布尔类型，可选值true／false；Lua中nil和false为“假”，其他所有值均为“真”；这一点和其他编程语言有些差异。
+
+number (数字)
+
+Number 类型用于表示实数，和C/C++里面的double类型很类似。可以使用数学函数math.floor（向下取整）和 math.ceil(向上取整)进行取整操作。
+
+一般地，Lua的number类型就是用双精度浮点数来实现的。值得一提的是，LuaJit支持所谓"dual-number"(双数)模式，即Luajit会根据上下文用整型来存储整数，而用双精度浮点数来存放浮点数。
+
+另外，Luajit还支持“长长整型”的大整数（在X86_64体系机构上则是64未整数）。

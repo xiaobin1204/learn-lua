@@ -327,3 +327,82 @@ until false
 > 该代码将导致死循环，因为until的条件一直为假，循环不会结束
 
 除此之外，repeat与其他语言的do-while基本是一样的。同样，Lua中的repeat也可以在使用break退出。
+
+for 控制结构
+
+Lua 提供了一组传统的、小巧的控制结构，包括用于条件判断的if用于迭代的while、repeat和for，本章节主要介绍for的使用。
+
+for数字型
+
+for语句有两种形式：数字for（numeric for）和范式for（generic for）。
+
+> 数字型for的语法如下：
+
+```
+for var = begin, finish, step do
+  --body
+end
+```
+
+关于数字for需要注意以下几点：
+
+1. var从begin变化到finish，每次变化都以step作为步长递增var
+2. begin、finish、step三个表达式只会在循环开始时执行一次
+3. 第三个表达式step是可选的，默认为1
+4. 控制变量var的作用域仅在for循环内，需要在外面控制，则需要将值赋给一个新的变量
+5. 循环过程中不要改变控制变量的值，那样会带来不可预知的影响
+
+> 示例
+
+```
+for i =1, 5 do
+  print(i)
+end
+--output
+1
+2
+3
+4
+5
+
+for i=1, 10, 2 do
+  print(i)
+end
+
+--output
+1
+3
+5
+7
+9
+```
+
+> 以下是这种循环的一个典型示例：
+
+```
+for i = 10, 1, -1 do
+  print(i)
+end
+--output
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+```
+
+如果不想给循环设置上限的话，可以使用常量math.huge:
+
+```
+for i = 1, math.huge do
+  if(0.3*i^3 - 20*i^2 - 500 >=0) then
+    print(i)
+    break
+  end
+end
+```

@@ -167,3 +167,21 @@ Lua 中的and和or是不同于c语言的。在c语言中，and和or只得到连�
 > test4.lua
 
 注意：所有逻辑操作符将false和nil视作假，其他任何值视作真，对于and和or，“短路求值”，对于not，永远只返回true或者false
+
+字符串链接
+
+在Lua中链接两个字符串，可以使用操作符“..”(两个点)。如果其任意一个操作数是数字的话，Lua会将这个数字转换成字符串。注意，连接操作符只会创建一个新的字符串，而不会改变原操作数。也可以使用string库函数`string.format`连接字符串。
+
+> test5.lua
+
+由于Lua字符串本质上是只读的，因此字符串连接运算符几乎总会创建一个新的（更大的）字符串。这意味着如果有很多这样的连接操作（比如在循环中使用..来拼接最终结果），则性能损耗会非常大。在这种情况下，推荐使用table和`table.concat()`来进行很多字符串的拼接，例如
+
+```
+local pieces = {}
+for i, elem in ipairs(my_list) do
+  pieces[i] = my_process(elem)
+end
+local res = table.concat(pieces)
+```
+
+当然，上面的例子还可以使用LuaJIT独有的`table.new`来恰当地初始化`pieces`表的空间，以避免该表的动态生长。这个特性我们在后面还会详细讨论。

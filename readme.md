@@ -202,3 +202,70 @@ not  #  - |
 > test6.lua
 
 若不确定某些操作符的优先级，就应显示地用括号来指定运算顺序。这样作可以提高代码的可读性。
+
+控制结构
+
+流程控制语句对于层序设计来数特别重要，它可以用于设定程序的逻辑结构。一般需要与条件判断语句结合使用。Lua语言提供的控制结构有`if`,`while`,`repeat`,`for`,并提供`break`关键字来满足更丰富的需求。本章主要介绍Lua语言的控制结构的使用。
+
+控制结构if-else
+
+if-else 是我们熟知的一种控制结构。Lua跟其他语言一样，提供了if-else的控制结构。因为是大家熟悉的语法，本节只简单介绍一下它的使用方法。
+
+单个if分支型
+
+```
+x = 10
+if x > 0 then
+  print("x is a positive number")
+end
+```
+
+> 运行输出：x is a positive number
+
+两个分支if-else型
+
+```
+x = 10
+if x >0 then
+  print("x is a positive number")
+else
+  print("x is a no-prositive number")
+end
+```
+
+> 运行输出：x is a prositive number
+
+多个分支if-elseif-else型
+
+```
+score = 90
+if score == 100 then
+  print("Very good!Your score is 100")
+elseif score >= 60 then
+  print("Congratulations, you have passed it, your score greater or equal to 60")
+--此处可以添加多个elseif
+else
+  print("Sorry, you do not pass the exam! ")
+end
+```
+
+> 运行输出：Congratulations, you have passed it, your score greater or equal to 60
+
+与C语言的不同之处是else与if是连在一起的，若将else与if写成“else if” 则相当于在else里嵌套另一个if语句，如下代码：
+
+```
+score = 0
+if score == 100 then
+  print("Very good! Your score is 100")
+elseif score >= 60 then
+  print("Congratulations, you have passed it, your score greater or equal to 60")
+else
+  if score > 0 then
+    print("Your score is better than 0")
+  else
+    print("My God, your score turned out to be 0")
+  end  --与上一示例代码不同的是，此处要添加一个end
+end
+```
+
+> 运行输出： My God, your score turned out to be 0

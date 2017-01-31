@@ -406,3 +406,99 @@ for i = 1, math.huge do
   end
 end
 ```
+
+for泛型
+
+泛型for循环通过一个迭代器（iterator）函数来遍历所有值：
+
+```
+-- 打印数组a的所有值
+local a = {"a", "b", "c", "d"}
+for i, v in ipairs(a) do
+  print("index:", i, " value:", v)
+end
+--output
+-- index:  1        value: a
+-- index:  2        value: b
+-- index:  3        value: c
+-- index:  4        value: d
+```
+
+Lua的基础库提供了impairs，这是一个用于遍历数组的迭代器函数。在每次循环中，i会被赋予一个索引值，同时v被赋予一个对应于该索引的数组元素值。
+
+> 下面是另一个类型的示例，演示了如何遍历一个table中所有的key
+
+```
+-- 打印table t中所有的key
+for k in pairs(t) do
+  print(k)
+end
+```
+
+从外观上看泛型for比较简单，但其实它是非常强大但。通过不同的迭代器，几乎可以遍历所有但东西，而且写出但代码极具可读性。标准库提供了集中迭代器，包括用于迭代文件中每行的（io.lines）、迭代table元素的（pairs）、迭代数组元素的（ipairs）、迭代字符串中单词的（string.gmatch）等。
+
+泛型for循环与数字型for循环有两个相同点：
+
+1. 循环变量是循环体的局部变量；
+2. 绝不应该对循环变量作任何赋值；
+
+对于泛型for的使用，再来看一个更具体的示例。建设有一个table，它的内容是一周中每天的名称：
+
+```
+local days = {
+  "sunday", "monday", "tuesday", "wednesday",
+  "thursday", "firday", "saturday"
+}
+```
+
+现在要将一个名称转化成它在一周中的位置。为此，需要根据给定的名称来搜索这个table。然而在Lua中，通常更有效的方法是创建一个“逆向table”。例如这个逆向table焦revDays，它以一周中每天的名称作为索引，位置数字作为值：
+
+```
+local revDays = {
+  ["sunday"] = 1,
+  ["monday"] = 2,
+  ["tuesday"] = 3,
+  ["wednesday"] = 4,
+  ["thursday"] = 5,
+  ["friday"] = 6,
+  ["saturday"] = 7,
+}
+```
+
+接下来，要找出一个名称所对应的需要，只需用名字来索引这个reverse table即可：
+
+```
+local x = "tuesday"
+print(revDays[x]) -->3
+```
+
+当然，不必手动声明这个逆向table，而是通过原来的table自动地构造出这个逆向table：
+
+```
+local days = {
+  "sunday", "monday", "tuesday", "wednesday",
+  "thursday", "firday", "saturday"
+}
+
+local revDays = {}
+for k, v in pairs(days) do
+  revDays[v] = k
+end
+
+-- print value
+for k, v in pairs(revDays) do
+  print("k:", k, " v:", v)
+end
+-- output
+-- k:      firday   v:     6
+-- k:      monday   v:     2
+-- k:      sunday   v:     1
+-- k:      thursday         v:     5
+-- k:      tuesday  v:     3
+-- k:      wednesday        v:     4
+-- k:      saturday         v:     7
+```
+
+这个循环会为每个元素进行赋值，其中变量k为key（1、2、……），变量v为value（“Sunday”、“Monday”、……）。
+
+值得一提的是，在LuaJIT2.1中，`ipairs()`内建函数是可以被JIT编译的，而`pairs()`则只能被解释执行。因此在性能敏感的场景，应该合理安排数据结构，避免对哈希表进行遍历。事实上，即使未来`pairs`可以被JIT编译，哈希表的遍历本身也不会有数组遍历那么高效，毕竟哈希表就不是为遍历而设计的数据结构。

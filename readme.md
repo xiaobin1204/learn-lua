@@ -502,3 +502,27 @@ end
 这个循环会为每个元素进行赋值，其中变量k为key（1、2、……），变量v为value（“Sunday”、“Monday”、……）。
 
 值得一提的是，在LuaJIT2.1中，`ipairs()`内建函数是可以被JIT编译的，而`pairs()`则只能被解释执行。因此在性能敏感的场景，应该合理安排数据结构，避免对哈希表进行遍历。事实上，即使未来`pairs`可以被JIT编译，哈希表的遍历本身也不会有数组遍历那么高效，毕竟哈希表就不是为遍历而设计的数据结构。
+
+break,return 关键字
+
+break
+
+语句 `break`用来终止`while`、`repeat`和`for`三种循环的执行，并跳出当前循环体，继续执行当前循环之后的语句。下面举一个`while`循环中的`break`的例子来说明：
+
+```
+-- 计算最小的x，使从1到x的所有数相加和大于100
+sum = 0
+i = 1
+while true do
+  sum = sum + i
+  if sum > 100 then
+    break
+  end
+  i = i + 1
+end
+print("The result is " .. i)
+
+--output:The result is 14
+```
+
+在实际应用中，`break` 经常用于嵌套循环中。

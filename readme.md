@@ -526,3 +526,19 @@ print("The result is " .. i)
 ```
 
 在实际应用中，`break` 经常用于嵌套循环中。
+
+return
+
+`return` 主要用于从函数中返回结果，或者用于简单的结束一个函数的执行。关于函数返回值的细节可以参考 *函数的返回值* 章节。 `return`只能写在语句块的最后，一旦执行了`return`语句，该语句之后的所有语句都不会再执行。若要写在函数中间，则只能写在一个显示的语句块内，参见示例代码：
+
+> return.lua
+
+有时候，为了调试方便，我们可以想在某个函数的中间提前`return`,以进行控制流的短路。此时我们可以将`return`放在一个`do ... end`代码块中，例如：
+
+```
+local function foo()
+  print("before")
+  do return end
+  print("after")  -- 这一句永远不会执行
+end
+```

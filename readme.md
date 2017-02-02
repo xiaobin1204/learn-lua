@@ -89,28 +89,28 @@ function (函数)
 
 有名函数的定义本质上是匿名函数对变量的赋值。为说明这一点，考虑
 
-```
+```lua
 function foo()
 end
 ```
 
 等价于
 
-```
+```lua
 foo = function ()
 end
 ```
 
 类似地，
 
-```
+```lua
 local function foo()
 end
 ```
 
 等价于
 
-```
+```lua
 local foo = function ()
 end
 ```
@@ -176,7 +176,7 @@ Lua 中的and和or是不同于c语言的。在c语言中，and和or只得到连�
 
 由于Lua字符串本质上是只读的，因此字符串连接运算符几乎总会创建一个新的（更大的）字符串。这意味着如果有很多这样的连接操作（比如在循环中使用..来拼接最终结果），则性能损耗会非常大。在这种情况下，推荐使用table和`table.concat()`来进行很多字符串的拼接，例如
 
-```
+```lua
 local pieces = {}
 for i, elem in ipairs(my_list) do
   pieces[i] = my_process(elem)
@@ -213,7 +213,7 @@ if-else 是我们熟知的一种控制结构。Lua跟其他语言一样，提供
 
 单个if分支型
 
-```
+```lua
 x = 10
 if x > 0 then
   print("x is a positive number")
@@ -224,7 +224,7 @@ end
 
 两个分支if-else型
 
-```
+```lua
 x = 10
 if x >0 then
   print("x is a positive number")
@@ -237,7 +237,7 @@ end
 
 多个分支if-elseif-else型
 
-```
+```lua
 score = 90
 if score == 100 then
   print("Very good!Your score is 100")
@@ -253,7 +253,7 @@ end
 
 与C语言的不同之处是else与if是连在一起的，若将else与if写成“else if” 则相当于在else里嵌套另一个if语句，如下代码：
 
-```
+```lua
 score = 0
 if score == 100 then
   print("Very good! Your score is 100")
@@ -276,7 +276,7 @@ Lua跟其他常见语言一样，提供了wile控制结构，语法上也没有�
 
 while 型控制结构语法如下，当表达式值为假（即false或nil）时结束循环。也可以使用break语言提前跳出循环。
 
-```
+```lua
 while 表达式 do
 --body
 end
@@ -284,7 +284,7 @@ end
 
 > 示例代码，求1+2+3+4+5的结果
 
-```
+```lua
 x = 1
 sum = 0
 
@@ -299,7 +299,7 @@ print(sum)  -->output 15
 
 没有提供`continue`，却也提供了另外一个标准控制语句`break`，可以跳出当前循环。例如我们遍历table，查找值为11的数组下标索引：
 
-```
+```lua
 local t = {1, 3, 5, 8, 11, 18, 21}
 
 local i
@@ -317,7 +317,7 @@ Lua中的repeat控制结构类似于其他语言（如：c++语言）中的do-wh
 
 > 以下代码将会形成死循环：
 
-```
+```lua
 x = 10
 repeat
   print(x)
@@ -338,7 +338,7 @@ for语句有两种形式：数字for（numeric for）和范式for（generic for�
 
 > 数字型for的语法如下：
 
-```
+```lua
 for var = begin, finish, step do
   --body
 end
@@ -354,7 +354,7 @@ end
 
 > 示例
 
-```
+```lua
 for i =1, 5 do
   print(i)
 end
@@ -379,7 +379,7 @@ end
 
 > 以下是这种循环的一个典型示例：
 
-```
+```lua
 for i = 10, 1, -1 do
   print(i)
 end
@@ -398,7 +398,7 @@ end
 
 如果不想给循环设置上限的话，可以使用常量math.huge:
 
-```
+```lua
 for i = 1, math.huge do
   if(0.3*i^3 - 20*i^2 - 500 >=0) then
     print(i)
@@ -411,7 +411,7 @@ for泛型
 
 泛型for循环通过一个迭代器（iterator）函数来遍历所有值：
 
-```
+```lua
 -- 打印数组a的所有值
 local a = {"a", "b", "c", "d"}
 for i, v in ipairs(a) do
@@ -428,7 +428,7 @@ Lua的基础库提供了impairs，这是一个用于遍历数组的迭代器函�
 
 > 下面是另一个类型的示例，演示了如何遍历一个table中所有的key
 
-```
+```lua
 -- 打印table t中所有的key
 for k in pairs(t) do
   print(k)
@@ -444,7 +444,7 @@ end
 
 对于泛型for的使用，再来看一个更具体的示例。建设有一个table，它的内容是一周中每天的名称：
 
-```
+```lua
 local days = {
   "sunday", "monday", "tuesday", "wednesday",
   "thursday", "firday", "saturday"
@@ -453,7 +453,7 @@ local days = {
 
 现在要将一个名称转化成它在一周中的位置。为此，需要根据给定的名称来搜索这个table。然而在Lua中，通常更有效的方法是创建一个“逆向table”。例如这个逆向table焦revDays，它以一周中每天的名称作为索引，位置数字作为值：
 
-```
+```lua
 local revDays = {
   ["sunday"] = 1,
   ["monday"] = 2,
@@ -467,14 +467,14 @@ local revDays = {
 
 接下来，要找出一个名称所对应的需要，只需用名字来索引这个reverse table即可：
 
-```
+```lua
 local x = "tuesday"
 print(revDays[x]) -->3
 ```
 
 当然，不必手动声明这个逆向table，而是通过原来的table自动地构造出这个逆向table：
 
-```
+```lua
 local days = {
   "sunday", "monday", "tuesday", "wednesday",
   "thursday", "firday", "saturday"
@@ -509,7 +509,7 @@ break
 
 语句 `break`用来终止`while`、`repeat`和`for`三种循环的执行，并跳出当前循环体，继续执行当前循环之后的语句。下面举一个`while`循环中的`break`的例子来说明：
 
-```
+```lua
 -- 计算最小的x，使从1到x的所有数相加和大于100
 sum = 0
 i = 1
@@ -535,7 +535,7 @@ return
 
 有时候，为了调试方便，我们可以想在某个函数的中间提前`return`,以进行控制流的短路。此时我们可以将`return`放在一个`do ... end`代码块中，例如：
 
-```
+```lua
 local function foo()
   print("before")
   do return end
@@ -549,7 +549,7 @@ Lua函数
 
 > 示例代码：
 
-```
+```lua
 print("hello world!")  --用 print() 函数输出hello world！
 local m = math.max(1, 5)  --调用数学库函数max， 用来求饿1，5中最大值，并返回赋给变量m
 ```
@@ -565,7 +565,7 @@ local m = math.max(1, 5)  --调用数学库函数max， 用来求饿1，5中最�
 
 Lua使用关键字 *function* 定义函数，语法如下：
 
-```
+```lua
 function function_name (arc) --arc 表示参数列表，函数的参数列表可以为空
   -- body
 end
@@ -573,7 +573,7 @@ end
 
 上面的语法定义了一个全局函数，名为 `function_name`。全局函数本质上就是函数类型的赋值给了一个全局变量，即上面的语法等价于
 
-```
+```lua
 function_name = function (arc)
   --body
 end
@@ -581,7 +581,7 @@ end
 
 由于全局变量一般会污染全局名字空间，同时也有性能损耗（即查询全局环境表的开销），因此我们应当尽量使用“局部函数”，其记法是类似的，只是开头加上`local`修饰符：
 
-```
+```lua
 local function function_name(arc)
   --body
 end
@@ -591,7 +591,7 @@ end
 
 > 示例代码：
 
-```
+```lua
 local function max(a, b)  --定义函数max，用来求两个数的最大值，并返回
   local temp = nil  --使用局部变量temp，保存最大值
   if(a > b) then
@@ -610,7 +610,7 @@ print(m)  -->output:20
 
 > 示例代码
 
-```
+```lua
 local function func()  --形参为空
   print("no parameter")
 end
@@ -627,7 +627,7 @@ func()  --函数调用，圆括号不能省
 
 由于函数定义定价于变量赋值，我们也可以把函数名替换为某个Lua表的某个字段，例如：
 
-```
+```lua
 function foo.bar(a, b, c)
   --body
 end
@@ -635,7 +635,7 @@ end
 
 此时我们是把一个函数类型的值赋值给了 `foo` 表的 `bar` 字段。换言之，上面的定义等价于
 
-```
+```lua
 foo.bar = function (a, b, c)
   print(a, b, c)
 end
@@ -651,7 +651,7 @@ Lua函数的参数大部分是按值传递的。值传递就是调用函数时�
 
 > 示例才买
 
-```
+```lua
 local function swap(a, b)  --定义函数swap，函数内部进行交换两个变量的值
   local temp = a
   a = b
@@ -675,7 +675,7 @@ print(x, y)  --调用swap函数后，x和y的值并没有交换
 
 > 示例代码：
 
-```
+```lua
 local function fun1(a, b)  --两个形参，多余的实参被忽略掉
   print(a, b)
 end
@@ -702,7 +702,7 @@ fun2(x, y, z)  -- 后面自动加上一个nil，参数变成x, y, z, nil
 
 > 示例代码：
 
-```
+```lua
 local function func( ... )  -- 形参为 ... ，表示函数采用变长参数
 
   local temp = {...}  -- 访问的时候也要使用 ...
@@ -728,7 +728,7 @@ Lua还支持通过名称来指定参数，这时候要把所有的实参组织�
 
 > 示例代码：
 
-```
+```lua
 local function change(arg)  --change 函数，改变长方形的长和宽，使其各增长一倍
   arg.width = arg.width * 2
   arg.height = arg.height * 2
@@ -768,3 +768,91 @@ after change: width = 40 height = 30
 ```
 
 在常用基本类型中，除了table是按址传递类型外，其它的都是按值传递参数。用全局变量来代替函数参数的不好编程习惯应该被抵制，良好的编程习惯应该是减少全局变量的使用。
+
+函数返回值
+
+Lua具有一项与众不同的特性，允许函数返回多个值。Lua的库函数中，有一些就是返回多个值。
+
+> 示例代码：使用库函数 `string.find`，在源字符串中查找目标字符串，若查找成功，则返回目标字符串在源字符串中的起始位置和结束位置的下标。
+
+```lua
+local s, e = string.find("hello world", "llo")
+print(s, e)  -->output 3 5
+```
+
+返回多个值时，值直接用“,”隔开。
+
+> 示例代码：定义一个函数，实现两个变量交换值
+
+```lua
+local function swap(a, b)  -- 定义函数swap，实现两个变量交换值
+  return b, a   --按相反顺序返回变量的值
+end
+
+local x = 1
+local y = 20
+x, y = swap(x, y)  调用 swap 函数
+print(x, y)  -->output 20 1
+```
+
+当函数返回值的个数和接收返回值的变量的个数不一致时，Lua也会自动调整参数个数。
+
+调整规则：若返回值个数大于接收变量的个数，多余的返回值会被忽略掉；若返回值个数小于参数个数，从左向右，没有被返回值初始化的变量会被初始化为 nil。
+
+> 示例代码：
+
+```lua
+function init()  --init函数 返回两个值 1 和 “lua”
+  return 1, "lua"
+end
+
+x = init()
+print(x)
+
+x, y, z = init()
+print(x, y, z)
+
+-->output
+1
+1 lua nil
+```
+
+当一个函数有一个以上返回值，且函数调用不是一个列表表达式的最后一个元素，那么函数调用只会产生一个返回值，也就是第一个返回值。
+
+> 示例代码：
+
+```lua
+local function init()   --init函数 返回两个值 1 和 “lua”
+  return 1, "lua"
+end
+
+local x, y, z = init(), 2  --init 函数的位置不在最后，此时只返回 1
+print(x, y, z)  -->output 1 2 nil
+
+local a, b, c = 2, init()  --init 函数的位置在最后, 此时返回 1 和 “lua”
+print(a, b, c)  -->output 2 1 lua
+```
+
+函数调用的实参列表也是一个列表表达式。考虑下面的例子：
+
+```lua
+local function init()
+  return 1, "lua"
+end
+
+print(init(), 2)  -->output 1 2
+print(2, init())  -->output 2 1 lua
+```
+
+如果你确保只取函数返回值的第一个值，可以使用括号运算符，例如
+
+```lua
+local function init()
+  return 1, "lua"
+end
+
+print((init()), 2)  -->output 1 2
+print(2, (init()))  -->output 2 1
+```
+
+值得一提的是，如果实参列表中某个函数会返回多个值，同时调用者又没有显式地使用括号运算符来筛选和过滤，则这样的表达式是不能被LuaJIT2所JIT编译的，而不能被解释执行。

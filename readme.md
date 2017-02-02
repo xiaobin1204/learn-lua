@@ -856,3 +856,35 @@ print(2, (init()))  -->output 2 1
 ```
 
 值得一提的是，如果实参列表中某个函数会返回多个值，同时调用者又没有显式地使用括号运算符来筛选和过滤，则这样的表达式是不能被LuaJIT2所JIT编译的，而不能被解释执行。
+
+全动态函数调用
+
+调用回调函数，并把一个数组参数作为回调函数的参数。
+
+```lua
+local args = {...} or {}
+method_name(unpack(args, 1, table.maxn(args)))
+```
+
+使用场景
+
+如果你的实参table中确定没有nil空洞，则可以简化为
+
+```lua
+method_name(unpack(args))
+```
+
+1. 你要调用的函数参数是未知的；
+2. 函数的实际参数的类型和数目也都是未知的。
+
+> 伪代码
+
+```lua
+add_task(end_time, callback, params)
+
+if os.time() >= endTime then
+  callback(unpack(params, 1, table.maxn(params)))
+end
+```
+
+值得一提的是，`unpack`内建函数还不能为LuaJIT所JIT编译，因此这种用法总是会被解释执行。对性能敏感的代码路径应该避免这种用法。

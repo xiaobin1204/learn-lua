@@ -695,3 +695,76 @@ fun2(x, y, z)  -- 后面自动加上一个nil，参数变成x, y, z, nil
 1 2
 1 2 3 nil
 ```
+
+变长参数
+
+上面函数的参数都是固定的，其实Lua还支持变长参数。若形参为`...`，示该函数可以接收不同长度的参数。访问参数的时候也要使用`...`。
+
+> 示例代码：
+
+```
+local function func( ... )  -- 形参为 ... ，表示函数采用变长参数
+
+  local temp = {...}  -- 访问的时候也要使用 ...
+  local ans = table.concat(temp, " ")  -- 使用 table.concat 库函数对数
+
+  print(ans)
+end
+
+func(1, 2)  --传递了两个参数
+func(1, 2, 3, 4)  --传递了四个参数
+
+--> output
+12
+
+1234
+```
+
+值得一提的是，LuaJIT2尚不能JIT编译这种变长参数的用法，只能解释执行。所以对性能敏感的代码，应当避免使用此种形式。
+
+具名参数
+
+Lua还支持通过名称来指定参数，这时候要把所有的实参组织到一个table中，并将这个table作为唯一的实参传给函数。
+
+> 示例代码：
+
+```
+local function change(arg)  --change 函数，改变长方形的长和宽，使其各增长一倍
+  arg.width = arg.width * 2
+  arg.height = arg.height * 2
+  return arg
+end
+
+local rectangle = { width = 20, height = 15 }
+print("before change: ", "width =", rectangle.width, "height =", rectangle.height)
+rectangle = change(rectangle)
+print("after change: ", "width =", rectangle.width, "height =", rectangle.height)
+
+-->output
+before change: width = 20 height = 15
+after change: width = 40 height = 30
+```
+
+按引用传递
+
+当函数参数是table类型时，传递进来的是实际参数的引用，此时在函数内部对该table所做的修改，会直接对调用者所传递的实际参数生效，而无需自己返回结果和让调用者进行赋值。我们把上面改变长方形长和宽的例子修改一下。
+
+> 示例代码：
+
+```lua
+function change(arg)  --change函数，改变长方形的长和宽，使其各增长一倍
+  arg.width = arg.width * 2  --表arg不是表rectangle的拷贝，他们是同一个表
+  arg.height = arg.height * 2
+end   --没有return语句了
+
+local rectangle = { width = 20, height = 15 }
+print("before change: ", "width =", rectangle.width, "height =", rectangle.height)
+change(rectangle)
+print("after change: ", "width =", rectangle.width, "height =", rectangle.height)
+
+-->output
+before change: width = 20 height = 15
+after change: width = 40 height = 30
+```
+
+在常用基本类型中，除了table是按址传递类型外，其它的都是按值传递参数。用全局变量来代替函数参数的不好编程习惯应该被抵制，良好的编程习惯应该是减少全局变量的使用。

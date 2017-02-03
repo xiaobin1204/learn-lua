@@ -894,3 +894,35 @@ end
 ## 模块
 
 从Lua5.1语言添加来对模块和包对支持。一个Lua模块对数据结构是用一个Lua值（通常是一个Lua表或者Lua函数）。一个Lua模块代码就是一个会返回这个Lua值对代码块。可以使用内建函数`require()`来加载和缓存模块。简单对说，一个代码模块就是一个程序库，可以通过`require`来加载。模块加载后的结果通过是一个Lua table，这个表就像是一个命名空间，其内容就是模块中导出的所有东西，比如函数和变量。`require`函数会返回Lua模块加载后的结果，即用于表示该Lua模块的Lua值。
+
+### require 函数
+
+Lua提供了一个名为`require`的函数用来加载模块。要加载一个模块，只需要简单地调用`require`“file”就可以了，file指模块所在的文件名。这个调用会返回一个由模块函数组成的table，并且还会定义一个包含该table的全局变量。
+
+在Lua中创建一个模块最简单的方法就是：创建一个table，并将所有需要导出的函数放入其中，最后返回这个table就可以了。相当于将导出的函数作为table的一个字段，在Lua中函数是第一类值，提供了天然的优势。
+
+> 把下面的代码保存在文件my.lua中
+
+```lua
+local foo = {}
+
+local function getname()
+  return "Lucy"
+end
+
+function foo.greeting()
+  print("hello " .. getname())
+end
+
+return foo
+```
+
+> 把下面的代码保存在文件main.lua中，然后执行main.lua,调用上述模块。
+
+```lua
+local fp = require("my")
+
+fp.greeting()  -->output: hello Lucy
+```
+
+注⚠️：对于需要导出给外部使用的公共模块，出于安全考虑，是要避免全局变量的出现。我们可以使用lua-releng工具完成全局变量的检测，具体参考lua的 局部变量 章节。

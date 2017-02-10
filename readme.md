@@ -1165,3 +1165,71 @@ print(string.gsub("Lua Lua Lua", "Lua", "hello", 2))  --指明第四个参数
 ```lua
 print(string.reverse("Hello Lua"))   -->output:auL olleH
 ```
+
+## table库
+
+table 库是由一些辅助函数构成对，这些函数将table作为数组来操作。
+
+**下标从1开始**
+
+在Lua中，数组下标从1开始计数。
+
+> 官方解释：Lua lists have a base index of 1 because it was thought to be most friendly for non-programmers, as it makes indices correspond to ordinal element positions.
+
+确实，对于我们数数来说，总是从1开始数的，而从0开始对于描述偏移量这样的东西有利。而Lua最初设计是一种类型XML的数据描述语言，从而索引(index)反应的是数据在里面的位置，而不是偏移量。
+
+在初始化一个数组的时候，若不显式地用键值对方式赋值，则会默认用数字作为下标，从1开始。由于在Lua内部实际采用哈希表和数组分别保存键值对、普通值，所以不推荐混合使用这两种赋值方式。
+
+> 示例代码 table_libs_1.lua
+
+从其他语言过来对开发者会觉得比较坑对一点是，当我们把table当作栈或者队列使用对时候，容易犯错，追加到table对是`s[#s+1] = something`，而不是`s[#s] = something`，而且如果这个something是一个nil的话，会导致这一次压栈（或者入队列）没有存入任何东西，#s的值没有变。如果`s = {1,2,3,4,5,6}`，你令`s[4] = nil`，#s会令你“匪夷所思”地变成3.
+
+### table.getn 获取长度
+
+取长度操作符写作一元操作#。字符串的长度是它的字节数（就是以一个字符一个字符计算的字符串长度）。
+
+对于常规的数组，里面用1到n放着一些并非空的值的时候，它的长度就精确的为n，即最后一个值的下标。如果数组有一个“空洞”（就是说，nil值被夹在非空值之间），那么#t可能是值向任何一个是nil值的前一个位置的下标（就是说，任何一个nil值都有可能被当成数组的结束）。这也就说明对于有“空洞”的情况，table的长度存在一定的不可确定性。
+
+```lua
+local tblTest1 = { 1, a = 2, 3}
+print("Test1 " .. table.getn(tblTest1))
+
+local tblTest2 = { 1, nil}
+print("Test2 " .. table.getn(tblTest2))
+
+local tblTest3 = { 1, nil, 2}
+print("Test3 " .. table.getn(tblTest3))
+
+local tblTest4 = { 1, nil, 2, nil}
+print("Test4 " .. table.getn(tblTest4))
+
+local tblTest5 = { 1, nil, 2, nil, 3, nil}
+print("Test5 " .. table.getn(tblTest5))
+
+local tblTest6 = {1, nil, 2, nil, 3, nil, 4, nil}
+print("Test6 " .. table.getn(tblTest6))
+
+```
+
+我们使用Lua5.1 和 LuaJIT2.1分别执行这个用例，结果如下：
+
+```lua
+# lua test.lua
+Test1 2
+Test2 1
+Test3 3
+Test4 1
+Test5 3
+Test6 1
+# luajit test.lua
+Test1 2
+Test2 1
+Test3 1
+Test4 1
+Test5 1
+Test6 1
+```
+
+这一段的输出结果，就是这么匪夷所思。请问，你以后还敢在lua的table中使用nil值吗？如果你继续往后面加nil，你可能会发现点什么。你可能认为你发现的是规律。但是，你千万不要认为这是个规律，因为这是错误的。
+
+不要在lua的table中使用nil值，如果一个元素要删除，直接remove，不要用nil去代替。

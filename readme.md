@@ -1233,3 +1233,41 @@ Test6 1
 这一段的输出结果，就是这么匪夷所思。请问，你以后还敢在lua的table中使用nil值吗？如果你继续往后面加nil，你可能会发现点什么。你可能认为你发现的是规律。但是，你千万不要认为这是个规律，因为这是错误的。
 
 不要在lua的table中使用nil值，如果一个元素要删除，直接remove，不要用nil去代替。
+
+### table.concat(table[,sep[,i[,j]]])
+
+对于元素是string或者number类型的表table，返回`table[i]..sep..table[i+1]···sep..table[j]`连接成字符串。填充字符串sep默认为空白字符串。起始索引位置i默认为1，结束索引位置j默认为table的长度。如果i大于j，返回一个空字符串。
+
+> table_libs_2.lua
+
+### table.insert(table,[pos,] value)
+
+在（数组型）表table的pos索引位置插入value，其它元素向后移动到空的地方。pos的默认值是表的长度加一，即默认是插在表的最后。
+
+> table_libs_insert.lua
+
+### table.maxn(table)
+
+返回（数组型）表table的最大索引编号；如果此表没有正在索引的编号，返回0.
+
+当长度省略时，此函数通常需要`0(n)`的时间复杂度来计算table的末尾。因此用这个函数省略索引位置的调用形式来作为table元素的末尾追加，是高代价操作。
+
+> table_libs_maxn.lua
+
+此函数的行为不同于`#`运算符，因为`#`可以返回数组中任意一个nil空洞或者最后一个nil之前的元素索引。当然，该函数的开销相比`#`运算也会更大一些。
+
+### table.remove(table[,pos])
+
+在表中删除索引为pos（pos只能是number型）的元素，并返回这个被删除的元素，它后面所有的元素的索引都会减一。pos的默认值是表的长度，即默认删除表的最后一个元素。
+
+> table_libs_remove.lua
+
+### table.sort(table[,comp])
+
+按照给定的比较函数comp给表table排序，也就是从table[1]到table[n]，这里n表示table的长度。比较函数有两个参数，如果希望第一个参数排在第二个前面，就应该放true，否则返回false。如果比较函数comp没有给出，默认从小到大排序。
+
+> table_libs_sort.lua
+
+### table 其它非常有用的函数
+
+LuaJIT2.1新增加的`table.new`和`table.clear`函数是非常有用的。前者主要用来预分配lua table空间，后者主要用来高效释放table空间，并且它们都可以被JIT编译的。具体可以参考一下OpenResty捆绑的lua-resty- * 库,里面有些实例可以作为参考。

@@ -1532,3 +1532,73 @@ setmetatable(mytable, mymetatable)
 
 ```lua
 local mytable = setmetatable({}, {})
+```
+
+#### 修改表的操作符行为
+
+通过重载"__add"元方法来计算集合的并集示例：
+
+> metatable1.lua
+
+除了加法可以被重载之外，Lua提供的所有操作符都可以被重载：
+
+| 元方法 | 含义 |
+| :------------- | :------------- |
+| "__add" | +操作 |
+| "__sub" | -操作 其行为类似于"add"操作 |
+| "__mul" | *操作 其行为类似于"add"操作|
+| "__div" | ／操作 其行为类似于"add"操作 |
+| "__mod" | %操作 其行为类似于"add"操作 |
+| "__pow" | ^(幂)操作 其行为类似于"add"操作 |
+| "__unm" | 一元-操作 |
+| "__concat" | ..(字符串连接)操作 |
+| "__len" | #操作 |
+| "__eq" | ==操作 函数getcomphandler定义了Lua怎样选择一个处理器来作比较操作 仅在两个对象类型相同且有对应操作相同的元方法时才有效 |
+| "__lt" | <操作 |
+| "__le" | <=操作 |
+
+除了操作符之外，如下元方法也可以被重载，下面会依次解释使用方法：
+
+| 元方法 | 含义 |
+| :------------- | :------------- |
+| "__index" | 取下标操作用于访问table[key] |
+| "__newindex" | 赋值给指定下标table[key]=value |
+| "__tostring" | 转换成字符串 |
+| "__call" | 当Lua调用一个值时调用 |
+| "__mode" | 用于弱表(week table) |
+| "__metatable" | 用于保护metatable不被访问 |
+
+#### __index元方法
+
+下面的例子中，我们实现了在表中查找键不存在时转而在元表中查找该键的功能：
+
+> metatable_index.lua
+
+关于__index元方法，有很多比较高阶的技巧，例如：__index的元方法不需要非是一个函数，也可以是一个表。
+
+```
+t = setmetatable({[1] = "hello"}, {__index = {[2] = "world"}})
+print(t[1], t[2])
+```
+
+第一句代码有点绕，解释一下：先是把{__index = {}}作为元表，但__index接受一个表，而不是函数，这个表中包含[2]="world"这个键值对。
+
+__index元方法还可以实现给表中每一个值赋上默认值；和__newindex元方法联合监控对表对读取、修改等比较高阶的功能，这个得自己开发。
+
+#### __tostring元方法
+
+与Java中的toString()函数类似，可以实现自定义的字符串转换。
+
+> metatable_tostring.lua
+
+#### __call元方法
+
+__call元方法的功能类似于C++中的仿函数，使得普通的表也可以被调用。
+
+>metatable_call.lua
+
+__metatable元方法
+
+假如我们想保护我们的对象使其使用者既看不到也不能修改metatables。我们可以对metatable设置了__metatable的值，getmetatable将返回这个域的值，而调用setmetatable将会出错：
+
+> metatable_metatable.lua

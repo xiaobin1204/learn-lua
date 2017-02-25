@@ -1512,3 +1512,23 @@ Lua I/O库提供两种不同的方式处理文件：隐式文件描述，显示�
 | “line” | 以行为单位，进行输出 |
 
 最后两种模式，size可以指定缓冲的大小（按字节），忽略size将自动调整为最佳大小。
+
+## 元表
+
+在Lua5.1语言中，元表(metatable)的表现行为类似于C++语言中的操作符重载，例如我们可以重载"__add"元方法(metamethod)，来计算两个Lua函数的并集；或者重载"__index"方法，来定义我们自己Hash函数。Lua提供了两个十分重要的用来处理元表的方法，如下：
+
+- setmetatable(table, metatable):此方法用于为一个元表设置元表。
+- getmetatable(table):此方法用于获取表的元表对象。
+
+设置元表的方法很简单，如下：
+
+```lua
+local mytable = {}
+local mymetatable = {}
+setmetatable(mytable, mymetatable)
+```
+
+上面的代码可以简写成如下的一行代码：
+
+```lua
+local mytable = setmetatable({}, {})

@@ -1697,3 +1697,117 @@ Checking line length exceeding 80...
 ```
 
 结果显示： 在 foo.lua 文件中，第 8 行设置了一个全局变量 A ； 在 use_foo.lua 文件中，没有版本信息，并且第 1 行设置了一个全局变量 A ，第 4、8 行使用了全局变量 A 。
+
+#### 判断数组大小
+
+table.getn(t) 等价于 #t 但计算的数组元素, 不包括 hash 键值. 而且数组是以第一个 nil 元素来判断数组结束, `#` 只计算 array 的元素个数, 它实际上调用了对象的 metatable 的`__len`函数. 对于有`__len`方法的函数返回函数返回值,不然就返回数组成员数目.
+
+Lua 中, 数组的实现方式其实类似于 c++ 中的 map, 对于数组中所有的值, 都是以键值对的形式来存储(无论是显示还是隐式), Lua 内部实际采用哈希表和数组分别保存键值对,普通值, 所以不推荐混合使用这两种赋值方式. 尤其需要注意的一点是: Lua 数组中允许 nil 值的存在, 但是数组默认结束标志却是 nil. 这类比于 C 语言中的字符串,字符串中允许'\0'存在,但当读到'\0'时, 就认为字符串已经结束了.
+
+初始化是例外, 在 Lua 相关源码中, 初始化数组时首先判断数组的长度,若长度大于0, 并且最后一个值不为 nil, 返回包括 nil 的长度;若最后一个值为 nil, 则返回截至第一个非 nil 值的长度.
+
+注意: 一定不要使用`#`操作符或`table.getn`来计算包含 nil 的数组的长度,这是一个未定义的操作,不一定报错, 但不能保证结果如你所想.如果你要删除一个数组中的元素,请使用 remove 函数,而不是用 nil 赋值.
+
+> array.lua
+
+这段的输出结果, 就是这么 **匪夷所思** . 不要在 Lua 的 table 中使用 nil 值, **如果一个元素要删除, 直接 remove, 不要用 nil 去代替**
+
+#### 非空判断
+
+大家在使用 Lua 的时候, 一定会遇到不少和 nil 有关的坑吧. 有时候不小心引用了一个没有赋值的变量, 这时它的值默认为 nil. 如果对一个 nil 进行索引的话, 会导致异常.
+
+如下:
+
+```lua
+local person = { name = "Bob", sex = "M" }
+
+-- do something
+person = nil
+-- do something
+
+print(person.name)
+```
+
+上面这个例子把 nil 的错误用法显而易地展示出来, 执行后, 会提示下面的错误:
+
+```shell
+luajit: person.lua:7: attempt to index local 'person' (a nil value)
+stack traceback:
+        person.lua:7: in main chunk
+        [C]: at 0x0103ea8960
+```
+
+然而, 在实际的工程代码中, 我们很难这么轻易地发现我们引用了 nil 变量.因此, 在很多情况下我们在访问以下 table 型变量时, 需要先判断变量是否为 nil, 例如将上面的代码改为:
+
+```lua
+local person = { name = "Bob", sex = "M" }
+
+-- do something
+person = nil
+-- do something
+
+if person ~= nil and person.name ~= nil then
+  print(person.name)
+else
+  -- do something
+end
+
+```
+
+对于简单类型的变量, 我们可以用`if(var == nil) then`这样的简单句子来判断.但是对于 table 型的 Lua 对象, 就不能这么简单判断它是否为空了. 一个 table 型变量的值可能是 {} , 这时它不等于 nil .我们来看下嘛这段代码:
+
+> empty.lua
+
+因此, 我们要判断一个 table 是否为 {}, 不能采用 `#table == 0`的方式来判断. 可以使用下面这样的方法来判断:
+
+```lua
+function isTableEmpty(t)
+  if t == nil or next(t) == nil then
+    return true
+  else
+    return false
+  end
+end
+```
+
+注意: `next` 指令是不能被 LuaJIT 的 JIT 编译优化, 并且 LuaJIT 貌似没有明确计划支持这个指令优化, 在不是必须的情况下, 尽量少用.
+
+#### 正则表达式
+
+在 openresty 中, 同时存在两套正则表达式规范: Lua 语言的规范和 `ngx.re.*`  的规范, 即使您对 Lua 语言中的规范非常熟悉, 我们仍不建议使用 Lua 中的正则表达式. 一是因为 Lua 中正则表达式的性能不如`ngx.re.*` 中的正则表达式优秀; 二是 Lua 中的正则表达式并不符合 POSIX 规范, 而 `ngx.re.*`中实现的是标准的 POSIX 规范, 后者明细更具备通用性.
+
+Lua 中的正则表达式与 Nginx 中的正则表达式相比, 有 5%-15% 的性能损失, 而且 Lua 将表达式编译成 Pattern 之后,并不会将 Pattern 缓存,而是每次使用都重新编译一遍, 潜在地降低了性能. `ngx.re.*` 中的正则表达式可以通过参数缓存编译后的 Pattern, 不会有类似的性能损失.
+
+`ngx.re.*`中的 `o` 选项,指明该参数, 被编译的 Pattern 将会在工作进程中缓存,并且被当前工作进程的每次请求所共享. Pattern 缓存的上限值通过 `lua_regex_cache_max_entries` 来修改.
+
+```nginx
+location /test {
+    content_by_lua_block {
+        local regex = [[\d+]]
+
+        -- 参数 "o" 是开启缓存必须的
+        local m = ngx.re.match("hello, 1234", regex, "o")
+        if m then
+            ngx.say(m[0])
+        else
+            ngx.say("not matched!")
+        end
+    }
+}
+```
+
+测试结果如下:
+```shell
+➜  ~ curl 127.0.0.1/test
+1234
+```
+
+#### Lua 正则简单汇总
+
+Lua 中正则表达式语法上最大的区别, Lua 用 '%' 来进行转义, 而其他语言的正则表达式使用'\'符号来进行转义. 其次, Lua 中并不使用'?'来表示非贪婪匹配, 而是定义了不同的字符来表示是否是贪婪匹配. 定义如下:
+| 符号 | 匹配次数 | 匹配模式 |
+| :------------- | :------------- | :------------- |
+| +      | 匹配前一个字符1次或多次      | 非贪婪 |
+| *      | 匹配前一个字符0次或多次      | 贪婪 |
+| -      | 匹配前一个字符0次或多次      | 非贪婪 |
+| ?      | 匹配前一个字符0次或1次      | 仅用于此, 不用于标识是否贪婪 |
